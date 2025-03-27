@@ -19,6 +19,8 @@
 #define UNDERLINE "\x1b[4m"
 #define RESET "\x1b[0m"
 
+#define RED "\x1b[31m"
+#define GREEN "\x1b[32m"
 #define YELLOW "\x1b[33m"
 
 void print(const char *s);
@@ -45,6 +47,26 @@ int main(int argc, char **argv, char **envp) {
   char **target_argv = argv;
 
 #ifdef DEBUG
+  debugln(
+      "built with:\n"
+      "\n"
+      "  REAL_LD        " YELLOW REAL_LD RESET
+      "\n"
+      "  KEEP_SUID      "
+#ifdef KEEP_SUID
+      BOLD GREEN "Yes" RESET
+#else
+      BOLD RED "No" RESET
+#endif
+      "\n"
+      "  DISABLE_ASLR   "
+#ifdef DISABLE_ASLR
+      BOLD GREEN "Yes" RESET
+#else
+      BOLD RED "No" RESET
+#endif
+      "\n");
+
   debug("linker argv: ");
   debug_argv(argv);
   print("\n");

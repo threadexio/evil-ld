@@ -12,6 +12,11 @@ ifneq ($(REAL_LD),)
 CFLAGS += -DREAL_LD=\"$(REAL_LD)\"
 endif
 
+KEEP_SUID ?= 1
+ifeq ($(KEEP_SUID),1)
+CFLAGS += -DKEEP_SUID
+endif
+
 DISABLE_ASLR ?= 1
 ifeq ($(DISABLE_ASLR),1)
 CFLAGS += -DDISABLE_ASLR

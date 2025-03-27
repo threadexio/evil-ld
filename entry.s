@@ -69,6 +69,22 @@ personality:
     pop ebp
     ret
 
+global setresuid
+setresuid:
+    push ebp
+    mov ebp, esp
+    push ebx
+
+    mov edx, [ebp+16]
+    mov ecx, [ebp+12]
+    mov ebx, [ebp+8]
+    mov eax, 164
+    int 0x80
+
+    pop ebx
+    pop ebp
+    ret
+
 ; int run(const char* linker, int target_argc, char** target_argv, char** target_envp)
 global run
 run:

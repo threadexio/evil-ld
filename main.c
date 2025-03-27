@@ -1,6 +1,7 @@
 #include <linux/personality.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <sys/types.h>
 
 #ifndef NAME
 #define NAME "evil-ld"
@@ -35,6 +36,7 @@ const char *basename(const char *path);
 extern void exit(int status) __attribute__((noreturn));
 extern size_t write(int fd, const char *buf, size_t len);
 extern int personality(unsigned long persona);
+extern int setresuid(uid_t ruid, uid_t euid, uid_t suid);
 extern int run(const char *linker, int argc, char *const target_argv[],
                char *const target_envp[]);
 
@@ -78,11 +80,17 @@ int main(int argc, char **argv, char **envp) {
 
   int err;
 
+#ifdef KEEP_SUID
+  err = setresuid(0, 0, 0);
+  if (err < 0) {
+    println("failed to set r/e/s uids");
+  }
+#endif
+
 #ifdef DISABLE_ASLR
   err = personality(ADDR_NO_RANDOMIZE);
   if (err < 0) {
     println("failed to set the no-ASLR personality");
-    return -err;
   }
 #endif
 

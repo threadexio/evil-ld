@@ -107,8 +107,7 @@ run:
     int 0x80                ; execve(REAL_LD, new_argv, target_envp)
 
     ; We need to "free" the `new_argv` array now. 
-    add esp, [ebp-12]
-    pop esi
+    add esp, esi
 
     pop esi
     pop ebx

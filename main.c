@@ -62,7 +62,7 @@ int main(int argc, char **argv, char **envp) {
   }
 
 #ifdef DEBUG
-  debug("executing target program: ");
+  debug("target argv: ");
   debug_argv(target_argv);
   print("\n");
 #endif

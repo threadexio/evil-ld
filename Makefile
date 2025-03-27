@@ -1,6 +1,11 @@
-CFLAGS ?= -DDEBUG
+CFLAGS ?=
 LFLAGS ?=
-ASMFLAGS ?= 
+ASMFLAGS ?=
+
+DEBUG ?= 1
+ifeq ($(DEBUG),1)
+CFLAGS += -DDEBUG
+endif
 
 evil-ld: entry.o main.o
 	ld $^ -o $@ -static -m elf_i386 -z noexecstack $(LFLAGS)

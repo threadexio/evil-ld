@@ -1,7 +1,9 @@
 #include <stdbool.h>
 #include <stddef.h>
 
+#ifndef NAME
 #define NAME "evil-ld"
+#endif
 
 #define STDOUT_FILENO 1
 #define STDERR_FILENO 2

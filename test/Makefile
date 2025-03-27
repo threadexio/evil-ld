@@ -7,4 +7,5 @@ example_real: example.c
 
 example_patched: example_real
 	cp $< $@
+	chmod +s $@
 	patchelf --set-interpreter "$(INTERPRETER)" $@

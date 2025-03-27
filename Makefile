@@ -33,8 +33,8 @@ endif
 
 OBJS := src/entry.s.o src/syscalls.s.o src/run.s.o src/main.c.o src/common.c.o
 
-$(NAME): $(OBJS)
-	$(LD) $^ -o $@ -static -m elf_i386 -z noexecstack $(LFLAGS)
+$(NAME): $(OBJS) src/errno-defs.h
+	$(LD) $(OBJS) -o $@ -static -m elf_i386 -z noexecstack $(LFLAGS)
 
 .PHONY:
 clean:
@@ -46,3 +46,5 @@ clean:
 %.c.o: %.c
 	$(CC) -c $< -o $@ -m32 -Wall -Wextra $(CFLAGS)
 
+src/errno-defs.h:
+	errno -l | sed -nr 's|^[A-Z]+\s([0-9]+)\s(.+)|case \1: return "\2";|p' | sort | uniq > $@

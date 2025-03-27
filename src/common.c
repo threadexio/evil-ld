@@ -78,3 +78,11 @@ const char *basename(const char *path) {
     return r + 1;
   }
 }
+
+const char *strerror(int errno) {
+  switch (errno) {
+#include "errno-defs.h"
+    default:
+      return "Unknown error";
+  }
+}

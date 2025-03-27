@@ -72,14 +72,20 @@ int main(int argc, char **argv, char **envp) {
 #ifdef KEEP_SUID
   err = setresuid(0, 0, 0);
   if (err < 0) {
-    println("failed to set r/e/s uids");
+    debug(BOLD RED "Failed" RESET " to set r/e/s uids: ");
+    println(strerror(-err));
+  } else {
+    debugln("Elevated privileges to effective uid");
   }
 #endif
 
 #ifdef DISABLE_ASLR
   err = personality(ADDR_NO_RANDOMIZE);
   if (err < 0) {
-    println("failed to set the no-ASLR personality");
+    debug(BOLD RED "Failed" RESET " to set the no-ASLR personality: ");
+    println(strerror(-err));
+  } else {
+    debugln("Disabled ASLR");
   }
 #endif
 

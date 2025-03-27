@@ -26,5 +26,6 @@ void *memrchr(const void *s, int c, size_t n);
 size_t strlen(const char *s);
 bool streq(const char *a, const char *b);
 const char *basename(const char *path);
+const char* strerror(int errno);
 
 #endif

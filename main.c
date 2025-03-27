@@ -5,6 +5,10 @@
 #define NAME "evil-ld"
 #endif
 
+#ifndef REAL_LD
+#define REAL_LD "/lib/ld-linux.so.2"
+#endif
+
 #define STDOUT_FILENO 1
 #define STDERR_FILENO 2
 
@@ -29,7 +33,7 @@ const char *basename(const char *path);
 // Exported by entry.s
 extern void exit(int status) __attribute__((noreturn));
 extern size_t write(int fd, const char *buf, size_t len);
-extern int run(int argc, char *const target_argv[], char *const target_envp[]);
+extern int run(const char* linker, int argc, char *const target_argv[], char *const target_envp[]);
 
 int main(int argc, char **argv, char **envp) {
   int target_argc = argc;
@@ -69,7 +73,7 @@ int main(int argc, char **argv, char **envp) {
   print("\n");
 #endif
 
-  int r = run(target_argc, target_argv, envp);
+  int r = run(REAL_LD, target_argc, target_argv, envp);
   println("failed to execute target program");
   return -r;  // The underlying `execve` returns -errno on any error. Let's
               // return the raw errno and let the user figure it out.

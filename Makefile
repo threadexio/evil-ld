@@ -7,6 +7,11 @@ ifeq ($(DEBUG),1)
 CFLAGS += -DDEBUG
 endif
 
+REAL_LD ?=
+ifneq ($(REAL_LD),)
+CFLAGS += -DREAL_LD=\"$(REAL_LD)\"
+endif
+
 evil-ld: entry.o main.o
 	ld $^ -o $@ -static -m elf_i386 -z noexecstack $(LFLAGS)
 

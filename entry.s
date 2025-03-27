@@ -55,7 +55,7 @@ write:
     pop ebp
     ret
 
-; int run(int target_argc, char** target_argv, char** target_envp)
+; int run(const char* linker, int target_argc, char** target_argv, char** target_envp)
 global run
 run:
     push ebp
@@ -65,27 +65,28 @@ run:
 
     ; Calculate how many bytes the `new_argv` array will take up.
     ; 
-    ;   new_argv = [ REAL_LD ] + target_argv
+    ;   new_argv = [ linker ] + target_argv
     ;
     ; Therefore:
     ;
-    ;   sizeof(new_argv) = sizeof(REAL_LD) + sizeof(target_argv)
+    ;   sizeof(new_argv) = sizeof(linker) + sizeof(target_argv)
     ;                    = 4 + (target_argc * 4 + 4)
     ;                    = 4 * (1 + target_argc + 1)
     ;                    = 4 * (target_argc + 2)
     ;
     ; Save the size in `esi`. We are going to need it later to "free" the
     ; `new_argv` array.
-    mov esi, [ebp+8] ; [ebp+8] is `target_argc`
+    mov esi, [ebp+12] ; [ebp+12] is `target_argc`
     add esi, 2
     imul esi, 4
     sub esp, esi
 
-    mov eax, [ebp+12] ; ebp+12 is `target_argv`   - source
+    mov eax, [ebp+16] ; [ebp+16] is `target_argv` - source
     mov ebx, esp      ; esp is `new_argv`         - destination
 
     ; Prepend the real linker.
-    mov dword [ebx], REAL_LD
+    mov ecx, [ebp+8] ; [ebp+8] is `linker`
+    mov [ebx], ecx
     add ebx, 4
 
     ; Copy over all remaining arguments.
@@ -100,11 +101,11 @@ run:
 
     ;;;;
 
-    mov edx, [ebp+16]       ; target_envp
+    mov edx, [ebp+20]       ; target_envp
     mov ecx, esp            ; new_argv
-    mov dword ebx, REAL_LD  ; READ_LD
+    mov ebx, [ebp+8]        ; linker
     mov eax, 11             ; execve
-    int 0x80                ; execve(REAL_LD, new_argv, target_envp)
+    int 0x80                ; execve(linker, new_argv, target_envp)
 
     ; We need to "free" the `new_argv` array now. 
     add esp, esi
@@ -113,6 +114,3 @@ run:
     pop ebx
     pop ebp
     ret
-
-section .data
-REAL_LD: db "/lib/ld-linux.so.2", 0

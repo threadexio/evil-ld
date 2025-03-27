@@ -12,6 +12,11 @@ ifneq ($(REAL_LD),)
 CFLAGS += -DREAL_LD=\"$(REAL_LD)\"
 endif
 
+DISABLE_ASLR ?= 1
+ifeq ($(DISABLE_ASLR),1)
+CFLAGS += -DDISABLE_ASLR
+endif
+
 evil-ld: entry.o main.o
 	ld $^ -o $@ -static -m elf_i386 -z noexecstack $(LFLAGS)
 

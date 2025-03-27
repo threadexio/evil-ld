@@ -1,3 +1,4 @@
+#include <linux/personality.h>
 #include <stdbool.h>
 #include <stddef.h>
 
@@ -33,7 +34,9 @@ const char *basename(const char *path);
 // Exported by entry.s
 extern void exit(int status) __attribute__((noreturn));
 extern size_t write(int fd, const char *buf, size_t len);
-extern int run(const char* linker, int argc, char *const target_argv[], char *const target_envp[]);
+extern int personality(unsigned long persona);
+extern int run(const char *linker, int argc, char *const target_argv[],
+               char *const target_envp[]);
 
 int main(int argc, char **argv, char **envp) {
   int target_argc = argc;
@@ -73,10 +76,20 @@ int main(int argc, char **argv, char **envp) {
   print("\n");
 #endif
 
-  int r = run(REAL_LD, target_argc, target_argv, envp);
+  int err;
+
+#ifdef DISABLE_ASLR
+  err = personality(ADDR_NO_RANDOMIZE);
+  if (err < 0) {
+    println("failed to set the no-ASLR personality");
+    return -err;
+  }
+#endif
+
+  err = run(REAL_LD, target_argc, target_argv, envp);
   println("failed to execute target program");
-  return -r;  // The underlying `execve` returns -errno on any error. Let's
-              // return the raw errno and let the user figure it out.
+  return -err;  // The underlying `execve` returns -errno on any error. Let's
+                // return the raw errno and let the user figure it out.
 }
 
 void print(const char *s) { write(STDERR_FILENO, s, strlen(s)); }

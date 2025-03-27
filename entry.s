@@ -55,6 +55,20 @@ write:
     pop ebp
     ret
 
+global personality
+personality:
+    push ebp
+    mov ebp, esp
+    push ebx
+
+    mov ebx, [ebp+8]
+    mov eax, 136
+    int 0x80
+
+    pop ebx
+    pop ebp
+    ret
+
 ; int run(const char* linker, int target_argc, char** target_argv, char** target_envp)
 global run
 run:

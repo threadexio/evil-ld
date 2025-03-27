@@ -31,7 +31,7 @@ ifeq ($(DISABLE_ASLR),1)
 CFLAGS += -DDISABLE_ASLR
 endif
 
-OBJS := src/entry.s.o src/main.c.o
+OBJS := src/entry.s.o src/syscalls.s.o src/run.s.o src/main.c.o src/common.c.o
 
 $(NAME): $(OBJS)
 	$(LD) $^ -o $@ -static -m elf_i386 -z noexecstack $(LFLAGS)
@@ -45,5 +45,4 @@ clean:
 
 %.c.o: %.c
 	$(CC) -c $< -o $@ -m32 -Wall -Wextra $(CFLAGS)
-
 

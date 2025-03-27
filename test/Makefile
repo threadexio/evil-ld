@@ -1,3 +1,5 @@
+INTERPRETER ?= $(shell realpath $$PWD/../evil-ld)
+
 all: example_real example_patched
 
 example_real: example.c
@@ -5,4 +7,4 @@ example_real: example.c
 
 example_patched: example_real
 	cp $< $@
-	patchelf --set-interpreter $$PWD/../evil-ld $@
+	patchelf --set-interpreter "$(INTERPRETER)" $@

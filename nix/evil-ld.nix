@@ -1,51 +1,33 @@
-{ stdenv
-, lib
-, gcc_multi
-, nasm
-, gnumake
-, coreutils
-, moreutils
-, patchelf
+{ lib
+, craneLib
 , ...
 }:
+with builtins;
 
 let
-  src = lib.fileset.unions [
-    ../src
-    ../Makefile
-  ];
-in
-
-stdenv.mkDerivation {
-  pname = "evil-ld";
-  version = "0.1.0";
-
-  src = lib.fileset.toSource {
+  src = with lib.fileset; toSource {
     root = ../.;
-    fileset = src;
+    fileset = unions [
+      ../Cargo.toml
+      ../Cargo.lock
+      ../src
+      ../.cargo
+    ];
   };
 
-  nativeBuildInputs = [
-    gcc_multi
-    nasm
-    gnumake
-    coreutils
-    moreutils
-    patchelf
-  ];
+  manifest = fromTOML (readFile ../Cargo.toml);
 
-  buildPhase = ''
-    # Allow overriding with `.overrideAttrs { REAL_LD = "..."; }`.
-    if [ -z "$REAL_LD" ]; then
-      # Take the interpreter from coreutils.
-      export REAL_LD="$(patchelf --print-interpreter "${coreutils}/bin/coreutils")"
-    fi
+  commonArgs = {
+    pname = manifest.package.name;
+    version = manifest.package.version;
 
-    make
-  '';
+    src = craneLib.cleanCargoSource src;
+    strictDeps = true;
 
-  installPhase = ''
-    mkdir -p $out
-    install -Dm755 ./evil-ld $out/bin/evil-ld
-  '';
-}
+    doCheck = false;
+  };
+
+  cargoArtifacts = craneLib.buildDepsOnly commonArgs;
+in
+
+craneLib.buildPackage (commonArgs // { inherit cargoArtifacts; })

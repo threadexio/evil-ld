@@ -38,6 +38,9 @@
 
         devShells.default = pkgs.mkShell {
           packages = with pkgs; [ rustToolchain ];
+
+          RUST_BACKTRACE = 1;
+          CARGO_BUILD_TARGET = "i686-unknown-linux-musl";
         };
 
         apps = flake-utils.lib.mkApp { drv = pkgs.evil-ld; };

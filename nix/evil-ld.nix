@@ -3,7 +3,9 @@
 , gcc_multi
 , nasm
 , gnumake
+, coreutils
 , moreutils
+, patchelf
 , ...
 }:
 
@@ -27,10 +29,18 @@ stdenv.mkDerivation {
     gcc_multi
     nasm
     gnumake
+    coreutils
     moreutils
+    patchelf
   ];
 
   buildPhase = ''
+    # Allow overriding with `.overrideAttrs { REAL_LD = "..."; }`.
+    if [ -z "$REAL_LD" ]; then
+      # Take the interpreter from coreutils.
+      export REAL_LD="$(patchelf --print-interpreter "${coreutils}/bin/coreutils")"
+    fi
+
     make
   '';
 

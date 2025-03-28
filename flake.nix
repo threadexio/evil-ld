@@ -21,6 +21,11 @@
       let pkgs = mkPkgs system; in
       {
         packages.default = pkgs.evil-ld;
+
+        devShells.default = pkgs.mkShell {
+          packages = pkgs.evil-ld.nativeBuildInputs;
+        };
+
         apps = flake-utils.lib.mkApp { drv = pkgs.evil-ld; };
       }
     );

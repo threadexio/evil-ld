@@ -1,11 +1,11 @@
-INTERPRETER ?= $(shell realpath $$PWD/../evil-ld)
+INTERPRETER ?= $(shell realpath -s $$PWD/loader)
 
 all: example_real example_patched
 
 example_real: example.c
-	cc $^ -o $@ -m32
+	cc $^ -o $@ -m32 -ggdb3
 
 example_patched: example_real
 	cp $< $@
-	chmod +s $@
 	patchelf --set-interpreter "$(INTERPRETER)" $@
+	chmod +s $@
